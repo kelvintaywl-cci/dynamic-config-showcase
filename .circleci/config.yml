@@ -23,18 +23,19 @@ jobs:
             or:
               - << pipeline.parameters.continue-pipeline-a >>
               - << pipeline.parameters.continue-pipeline-b >>
-           steps:
-             - checkout
-             - run:
-                 name: Determine next configuration
-                 command: |
-                   CFG_PATH=".circleci/config-a.yml"
-                   if [ << pipeline.parameters.continue-pipeline-b >> ]; then
-                     CFG_PATH=".circleci/config-b.yml"
-                   fi
-                   echo "export CFG_PATH=$CFG_PATH" >> $BASH_ENV
-             - continuation/continue:
-                 configuration_path: $CFG_PATH
+          steps:
+            - checkout
+            - run:
+                name: Determine next configuration
+                command: |
+                  CFG_PATH=".circleci/config-a.yml"
+                  if [ << pipeline.parameters.continue-pipeline-b >> ]; then
+                    CFG_PATH=".circleci/config-b.yml"
+                  fi
+                  printenv CFG_PATH
+                  echo "export CFG_PATH=$CFG_PATH" >> $BASH_ENV
+            - continuation/continue:
+                configuration_path: $CFG_PATH
       - unless:
           condition:
             or:
