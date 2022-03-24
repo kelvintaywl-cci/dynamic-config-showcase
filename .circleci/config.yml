@@ -29,7 +29,7 @@ jobs:
                 name: Determine next configuration
                 command: |
                   CFG_PATH=".circleci/config-a.yml"
-                  if [ "<< pipeline.parameters.continue-pipeline-b >>" = true ]; then
+                  if [ "<< pipeline.parameters.continue-pipeline-b >>" = "true" ]; then
                     CFG_PATH=".circleci/config-b.yml"
                   fi
 
