@@ -1,0 +1,48 @@
+version: 2.1
+
+setup: true
+
+orbs: 
+  continuation: circleci/continuation@0.2.0
+
+parameters:
+  continue-pipeline-a:
+    type: boolean
+    default: true
+  continue-pipeline-b:
+    type: boolean
+    default: false
+
+jobs:
+  gateway:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - when:
+          condition:
+            or:
+              - << pipeline.parameters.continue-pipeline-a >>
+              - << pipeline.parameters.continue-pipeline-b >>
+           steps:
+             - checkout
+             - run:
+                 name: Determine next configuration
+                 command: |
+                   CFG_PATH=".circleci/config-a.yml"
+                   if [ << pipeline.parameters.continue-pipeline-b >> ]; then
+                     CFG_PATH=".circleci/config-b.yml"
+                   fi
+                   echo "export CFG_PATH=$CFG_PATH" >> $BASH_ENV
+             - continuation/continue:
+                 configuration_path: $CFG_PATH
+      - unless:
+          condition:
+            or:
+              - << pipeline.parameters.continue-pipeline-a >>
+              - << pipeline.parameters.continue-pipeline-b >>
+          steps:
+            - continuation/finish
+workflows:
+  setup:
+    jobs:
+      - gateway
