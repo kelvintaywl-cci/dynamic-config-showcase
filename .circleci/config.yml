@@ -32,6 +32,7 @@ jobs:
                   if [ << pipeline.parameters.continue-pipeline-b >> ]; then
                     CFG_PATH=".circleci/config-b.yml"
                   fi
+
                   printenv CFG_PATH
                   echo "export CFG_PATH=$CFG_PATH" >> $BASH_ENV
             - continuation/continue:
