@@ -4,7 +4,10 @@ parameters:
   continue:
     type: boolean
     default: false
-  build-code:
+  build-repo-a:
+    type: boolean
+    default: false
+  build-repo-b:
     type: boolean
     default: false
 
@@ -20,26 +23,38 @@ jobs:
     steps:
       - run: echo "DONE"
   build:
+    parameters:
+      workdir:
+        type: string
     executor: base
+    working_directory: << parameters.workdir >>
     steps:
-      - checkout
-      - run: cat src/bar.py
+      - checkout:
+          path: ~/project
+      - run: |
+          ls -laH .
 
 workflows:
   no-op:
     when:
       and:
-        - not: << pipeline.parameters.build-code >>
-        - << pipeline.parameters.continue >>
+        - not: << pipeline.parameters.build-repo-a >>
+        - not: << pipeline.parameters.build-repo-b >>
     jobs:
       - done
-  build-code:
-    when:
-      and:
-        - << pipeline.parameters.build-code >>
-        - << pipeline.parameters.continue >>
+  repo-a:
+    when: << pipeline.parameters.build-repo-a >>
     jobs:
-      - build
+      - build:
+          workdir: repo-a
+      - done:
+          requires:
+            - build
+  repo-b:
+    when: << pipeline.parameters.build-repo-b >>
+    jobs:
+      - build:
+          workdir: repo-a
       - done:
           requires:
             - build
