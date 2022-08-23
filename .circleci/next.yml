@@ -1,9 +1,6 @@
 version: 2.1
 
 parameters:
-  continue:
-    type: boolean
-    default: false
   build-repo-a:
     type: boolean
     default: false
