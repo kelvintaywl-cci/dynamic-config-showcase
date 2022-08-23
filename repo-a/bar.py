@@ -1,2 +1,2 @@
-# Zen
+# Zen of Python
 import this
