@@ -34,6 +34,8 @@ orbs:
                         Path to save the generated parameters to.
                     type: string
             steps:
+                - run: |
+                    git show --name-only $CIRCLE_SHA1
                 - run:
                     command: |+
                         #!/usr/bin/env python3
