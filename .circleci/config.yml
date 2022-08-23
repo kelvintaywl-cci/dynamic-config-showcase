@@ -12,6 +12,5 @@ workflows:
       - path/filter:
           config-path: .circleci/next.yml
           mapping: |
-            .* continue true
             repo-a/.* build-repo-a true
             repo-b/.* build-repo-b true
