@@ -35,7 +35,7 @@ orbs:
                     type: string
             steps:
                 - run: |
-                    git show --name-only $CIRCLE_SHA1
+                    git show --no-pager --name-only $CIRCLE_SHA1
                 - run:
                     command: |+
                         #!/usr/bin/env python3
