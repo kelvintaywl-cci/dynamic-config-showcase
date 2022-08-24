@@ -19,39 +19,39 @@ jobs:
     executor: base
     steps:
       - run: echo "DONE"
-  build:
-    parameters:
-      workdir:
-        type: string
+  build-repo-a:
     executor: base
-    working_directory: << parameters.workdir >>
+    working_directory: ~/project/repo-a
     steps:
+      - unless:
+          condition: << pipeline.parameters.build-repo-a >>
+          steps:
+            - run: |
+                circleci-agent step halt
+      - checkout:
+          path: ~/project
+      - run: |
+          ls -laH .
+  build-repo-b:
+    executor: base
+    working_directory: ~/project/repo-b
+    steps:
+      - unless:
+          condition: << pipeline.parameters.build-repo-b >>
+          steps:
+            - run: |
+                circleci-agent step halt
       - checkout:
           path: ~/project
       - run: |
           ls -laH .
 
 workflows:
-  no-op:
-    when:
-      and:
-        - not: << pipeline.parameters.build-repo-a >>
-        - not: << pipeline.parameters.build-repo-b >>
+  just-this-one:
     jobs:
-      - done
-  repo-a:
-    when: << pipeline.parameters.build-repo-a >>
-    jobs:
-      - build:
-          workdir: repo-a
+      - build-repo-a
+      - build-repo-b
       - done:
           requires:
-            - build
-  repo-b:
-    when: << pipeline.parameters.build-repo-b >>
-    jobs:
-      - build:
-          workdir: repo-a
-      - done:
-          requires:
-            - build
+            - build-repo-a
+            - build-repo-b
