@@ -215,13 +215,29 @@ orbs:
                                     doc/.* build-docs true
 
 
-
+jobs:
+  exit-early:
+    docker:
+      - image: cimg/base:stable
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Exit early if only config changed
+          command: |
+            # list files changed since previous commit
+            git diff --name-only HEAD~1 HEAD > changed.txt
+            
+            if [ $(wc -l < changed.txt) -eq 1 ] && [ $(head -n 1 changed.txt) = ".circleci/config.yml" ]; then
+              circleci-agent step halt
+            fi
+      - run:
+          name: test
+          command: |
+            echo "this is run only if the halt was not executed"
+            
 
 workflows:
   setup:
     jobs:
-      - path/filter:
-          config-path: .circleci/next.yml
-          mapping: |
-            repo-a/.* build-repo-a true
-            repo-b/.* build-repo-b true
+      - exit-early
