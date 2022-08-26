@@ -1,10 +1,13 @@
 version: 2.1
 
 parameters:
-  build-repo-a:
+  repo_a:
     type: boolean
     default: false
-  build-repo-b:
+  repo_b:
+    type: boolean
+    default: false
+  repo_c:
     type: boolean
     default: false
 
@@ -14,44 +17,89 @@ executors:
       - image: cimg/base:stable
     resource_class: small
 
-jobs:
-  done:
-    executor: base
-    steps:
-      - run: echo "DONE"
-  build:
+commands:
+  exit-early-if-irrelevant:
     parameters:
-      workdir:
-        type: string
-    executor: base
-    working_directory: << parameters.workdir >>
+      for:
+        type: enum
+        enum:
+          - repo_a
+          - repo_b
+          - repo_c
     steps:
-      - checkout:
-          path: ~/project
-      - run: |
-          ls -laH .
+      - run:
+          name: stop early unless relevant
+          command: |
+            if [[ $CIRCLE_JOB == *"<< parameters.for >>"* ]] && [[ $(eval echo "\$$CIRCLE_JOB") == "1" ]];
+              echo "continuing, since job name indicates it is for << parameters.for >>"
+            else
+              echo "stopping early!"
+              circleci-agent step halt
+            fi
+
+jobs:
+  test_repo_a:
+    executor: base
+    steps:
+      # exit early IF pipeline.parameters.repo_a is FALSE
+      - unless:
+          condition: << pipeline.parameters.repo_a >>
+          steps:
+            - run: |
+                circleci-agent step halt
+      - checkout
+      - run: echo "TODO test repo_a"
+  test:
+    parameters:
+      for:
+        type: enum
+        enum:
+          - repo_a
+          - repo_b
+          - repo_c
+    executor: base
+    steps:
+      - exit-early-if-irrelevant:
+          for: << parameters.for >>
+      - checkout
+      - run: "echo TODO test << parameters.for >>"
+  deploy:
+    parameters:
+      for:
+        type: enum
+        enum:
+          - repo_a
+          - repo_b
+          - repo_c
+    executor: base
+    steps:
+      - exit-early-if-irrelevant:
+          for: << parameters.for >>
+      - checkout
+      - run: "echo DONE deploy << parameters.for >>"
 
 workflows:
-  no-op:
-    when:
-      and:
-        - not: << pipeline.parameters.build-repo-a >>
-        - not: << pipeline.parameters.build-repo-b >>
+  repo_a:
     jobs:
-      - done
-  repo-a:
-    when: << pipeline.parameters.build-repo-a >>
+      - test_repo_a
+
+  repo_b:
     jobs:
-      - build:
-          workdir: repo-a
-      - done:
+      - test:
+          for: repo_b
+          name: test_repo_b
+      - deploy:
+          for: repo_b
+          name: deploy_repo_b
           requires:
-            - build
-  repo-b:
-    when: << pipeline.parameters.build-repo-b >>
+            - test_repo_b
+  repo_c:
     jobs:
-      - build:
-          workdir: repo-a
-      - done:
+      - test:
+          for: repo_c
+          name: test_repo_c
+      - deploy:
+          for: repo_c
+          name: deploy_repo_c
           requires:
-            - build
+            - test_repo_c
