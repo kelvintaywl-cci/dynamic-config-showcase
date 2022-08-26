@@ -36,6 +36,10 @@ commands:
               echo "stopping early!"
               circleci-agent step halt
             fi
+          environment:
+            repo_a: << pipeline.parameters.repo_a >>
+            repo_b: << pipeline.parameters.repo_b >>
+            repo_c: << pipeline.parameters.repo_c >>
 
 jobs:
   test_repo_a:
