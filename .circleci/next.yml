@@ -30,12 +30,7 @@ commands:
       - run:
           name: stop early unless relevant
           command: |
-            printenv repo_a
-            printenv repo_b
-            printenv repo_c
-
             export RELEVANT=$(eval echo "\$<< parameters.for >>")
-            printenv RELEVANT
 
             if [[ $CIRCLE_JOB == *"<< parameters.for >>"* ]] && [[ $RELEVANT == "1" ]]; then
               echo "continuing, since job name indicates it is for << parameters.for >>"
