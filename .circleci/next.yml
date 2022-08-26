@@ -30,7 +30,7 @@ commands:
       - run:
           name: stop early unless relevant
           command: |
-            if [[ $CIRCLE_JOB == *"<< parameters.for >>"* ]] && [[ $(eval echo "\$$CIRCLE_JOB") == "1" ]];
+            if [[ $CIRCLE_JOB == *"<< parameters.for >>"* ]] && [[ $(eval echo "\$$CIRCLE_JOB") == "1" ]]; then
               echo "continuing, since job name indicates it is for << parameters.for >>"
             else
               echo "stopping early!"
