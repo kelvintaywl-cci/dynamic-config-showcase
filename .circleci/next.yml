@@ -21,6 +21,7 @@ commands:
   exit-early-if-irrelevant:
     parameters:
       for:
+        description: which repo this job is relevant for
         type: enum
         enum:
           - repo_a
@@ -30,10 +31,12 @@ commands:
       - run:
           name: stop early unless relevant
           command: |
+            # looks up the relevant pipeline parameter via the env var
             export RELEVANT=$(eval echo "\$<< parameters.for >>")
 
-            if [[ $CIRCLE_JOB == *"<< parameters.for >>"* ]] && [[ $RELEVANT == "1" ]]; then
-              echo "continuing, since job name indicates it is for << parameters.for >>"
+            # NOTE: env var values are strings (not boolean)
+            if [ "${RELEVANT}" = "1" ]; then
+              echo "continuing, since job is for << parameters.for >>"
             else
               echo "stopping early!"
               circleci-agent step halt
