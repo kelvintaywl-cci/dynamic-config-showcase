@@ -71,7 +71,9 @@ jobs:
       - exit-early-if-irrelevant:
           for: << parameters.for >>
       - checkout
-      - run: "echo TODO test << parameters.for >>"
+      - run: |
+          sleep 5
+          echo "TODO test << parameters.for >>"
   deploy:
     parameters:
       for:
@@ -85,7 +87,9 @@ jobs:
       - exit-early-if-irrelevant:
           for: << parameters.for >>
       - checkout
-      - run: "echo DONE deploy << parameters.for >>"
+      - run: |
+          sleep 5
+          echo "DONE deploy << parameters.for >>"
 
 workflows:
   repo_a:
