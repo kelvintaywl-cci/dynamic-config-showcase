@@ -11,6 +11,9 @@ Currently, this project simulates the scenario where:
 - We have separate workflows to trigger based on folders changed (via [the path-filtering Orb](https://circleci.com/developer/orbs/orb/circleci/path-filtering)).
 - We want to use GitHub branch protection rules, for pull requests (PRs).
 
+<img width="403" alt="Screen Shot 2022-08-27 at 9 19 16" src="https://user-images.githubusercontent.com/2164346/187006304-33a4d0bb-cca9-4c0e-ae6a-281dceefd3a9.png">
+
+
 ## Problems
 
 The main challenge:
@@ -28,6 +31,9 @@ This setup deploys a solution where:
 By ensuring all workflows run, all jobs in the workflows are reported back to GitHub.
 
 By exiting early for non-relevant jobs, these jobs are still "green" (successful).
+
+You can see this in action in https://github.com/kelvintaywl-cci/dynamic-config-showcase/pull/6 where we only run repo_c workflow effectively when repo-c folder is modified;
+All other jobs in the other workflows exited early.
 
 ## Explanation
 
