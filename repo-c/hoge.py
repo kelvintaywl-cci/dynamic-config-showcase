@@ -1,1 +1,2 @@
-print("repo-c")
+if __name__ == "__main__":
+    print("repo-c")
